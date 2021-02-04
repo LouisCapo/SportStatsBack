@@ -1,0 +1,6 @@
+{
+    "port": 3000,
+    "mongoUri": "mongodb+srv://diplom-user:q1w2e3@cluster0.tctxc.mongodb.net/SportStats?retryWrites=true&w=majority",
+    "dbuser": "diplom-user",
+    "dbpass": "q1w2e3"
+}
