@@ -23,6 +23,8 @@ const Player = mongoose.model('players', {
 
 	playerPhoto: { type: String },
 
+	playerBirthday: { type: String },
+
 	playerTeam: { type: Schema.Types.ObjectId, ref: 'teams' },
 	
 	playerAchievements: [ {type: String} ],
