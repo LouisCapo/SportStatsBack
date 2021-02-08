@@ -1,10 +1,11 @@
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
 
 const playerRouter = require('./routes/player');
 const teamRouter = require('./routes/team')
+const newsRouter = require('./routes/news');
 
 const app = express();
 
@@ -26,7 +27,8 @@ app.use(function (req, res, next) {
 });
 
 
-app.use('/api/players', playerRouter);
+app.use('/api/players/', playerRouter);
 app.use('/api/teams/', teamRouter);
+app.use('/api/news/', newsRouter);
 
 module.exports = app;

@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../model/db');
 const helper = require('../services/helper');
 
-router.get('/get-team', (req, res, next) => {
+router.get('/get-news', (req, res, next) => {
   try {
     const { id } = req.query;
     if (id.length !== 24) {
@@ -14,36 +14,22 @@ router.get('/get-team', (req, res, next) => {
           },
         }).status(400);
     }
-    db.Team.findById(id)
-      .populate('teamMembers')
-      .then((currentTeam) => {
-        if (!currentTeam) {
+    db.News.findById(id)
+      .then((currentNews) => {
+        if (!currentNews) {
           return res.send({
               error: {
                 code: 1,
-                msg: 'Команда не найдена!',
+                msg: 'Новость не найдена!',
               },
             }).status(404);
         }
-        const teamMembers = [];
-        currentTeam.teamMembers.forEach((el) => {
-          teamMembers.push({
-            memberName: el.playerName,
-            memberNick: el.playerNick,
-            memberId: el._id,
-            memberPhoto: el.playerPhoto,
-          });
-        });
         const data = {
-          teamId: currentTeam._id,
-          teamName: currentTeam.teamName,
-          teamLogo: currentTeam.teamLogo,
-          teamMembers: teamMembers,
-          teamStats: currentTeam.teamStats,
-          sportType: currentTeam.sportType,
-          memberAverageAge: helper.getMembersAverageAge(
-            currentTeam.teamMembers
-          ),
+          newsId: currentNews._id,
+          newsTitle: currentNews.title,
+          newsSubTitle: currentNews.subTitle,
+          newsDate: currentNews.date,
+          newsPhotos: currentNews.photos ? currentNews.photos : null,
         };
         res.send(data).status(200);
       })
@@ -51,7 +37,7 @@ router.get('/get-team', (req, res, next) => {
         return res.send({
             error: {
               code: 1,
-              msg: 'Команда не найдена!',
+              msg: 'Новость не найдена!',
             },
           }).status(404);
       });

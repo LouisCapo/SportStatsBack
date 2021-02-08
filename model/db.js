@@ -13,37 +13,46 @@ mongoose
   })
   .catch((err) => {
     console.error('Can t connect to db', err);
-	});
-	
+  });
+
 const Player = mongoose.model('players', {
+  playerName: { type: String, require: true },
 
-	playerName: { type: String, require: true},
+  playerNick: { type: String },
 
-	playerNick: { type: String },
+  playerPhoto: { type: String },
 
-	playerPhoto: { type: String },
+  playerBirthday: { type: String },
 
-	playerBirthday: { type: String },
+  playerTeam: { type: Schema.Types.ObjectId, ref: 'teams' },
 
-	playerTeam: { type: Schema.Types.ObjectId, ref: 'teams' },
-	
-	playerAchievements: [ {type: String} ],
+  playerAchievements: [{ label: String, newsId: String }],
 
-	playerStats: [ {type: Object} ]
+  playerStats: [{ type: Object }],
 });
 
 const Team = mongoose.model('teams', {
+  teamName: { type: String, require: true },
 
-	teamName: { type: String, require: true },
+  teamLogo: { type: String },
 
-	teamLogo: { type: String },
+  teamMembers: [{ type: Schema.Types.ObjectId, ref: 'players' }],
 
-	teamMembers: [ { type: Schema.Types.ObjectId, ref: 'players' } ],
+  teamStats: [{ type: Object }],
 
-	teamStats: [ { type: Object } ],
+  sportType: { type: String },
+});
 
-	sportType: { type: String },
+const News = mongoose.model('news', {
+  title: { type: String, require: true },
 
-})
+  subTitle: { type: String, require: true },
 
-module.exports = { Player, Team }
+  description: { type: String, require: true },
+
+  date: { type: String, require: true },
+
+  photos: [{ type: String }],
+});
+
+module.exports = { Player, Team, News };
