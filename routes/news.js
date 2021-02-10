@@ -27,9 +27,11 @@ router.get('/get-news', (req, res, next) => {
         const data = {
           newsId: currentNews._id,
           newsTitle: currentNews.title,
-          newsSubTitle: currentNews.subTitle,
+          newsSubtitle: currentNews.subtitle,
+          newsText: currentNews.newsText,
           newsDate: currentNews.date,
           newsPhotos: currentNews.photos ? currentNews.photos : null,
+          sportType: currentNews.sportType
         };
         res.send(data).status(200);
       })

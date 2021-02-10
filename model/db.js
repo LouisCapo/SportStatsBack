@@ -40,19 +40,21 @@ const Team = mongoose.model('teams', {
 
   teamStats: [{ type: Object }],
 
-  sportType: { type: String },
+  sportType: { type: String, require: true },
 });
 
 const News = mongoose.model('news', {
   title: { type: String, require: true },
 
-  subTitle: { type: String, require: true },
+  subtitle: { type: String, require: true },
 
-  description: { type: String, require: true },
+  newsText: { type: String, require: true },
 
   date: { type: String, require: true },
 
   photos: [{ type: String }],
+
+  sportType: { type: String, require: true }
 });
 
 module.exports = { Player, Team, News };
