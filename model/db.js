@@ -29,6 +29,10 @@ const Player = mongoose.model('players', {
   playerAchievements: [{ label: String, newsId: String }],
 
   playerStats: [{ type: Object }],
+
+  sportType: { type: String, require: true },
+
+  sportTypeCode: { type: Number, require: true }
 });
 
 const Team = mongoose.model('teams', {
@@ -41,6 +45,8 @@ const Team = mongoose.model('teams', {
   teamStats: [{ type: Object }],
 
   sportType: { type: String, require: true },
+
+  sportTypeCode: { type: Number, require: true }
 });
 
 const News = mongoose.model('news', {
@@ -54,7 +60,9 @@ const News = mongoose.model('news', {
 
   photos: [{ type: String }],
 
-  sportType: { type: String, require: true }
+  sportType: { type: String, require: true },
+
+  sportTypeCode: { type: Number, require: true }
 });
 
 module.exports = { Player, Team, News };
