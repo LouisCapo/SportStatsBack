@@ -1,6 +1,13 @@
+const bCrypt = require('bcrypt');
+
 const getCurrentAge = (birthday) => {
   return Math.floor(((new Date().getTime() - new Date(birthday)) / (24 * 3600 * 365.25 * 1000)) | 0);
 }
+
+const isValidPassword = (password, hashedPassword) => {
+  return bCrypt.compareSync(password, hashedPassword);
+};
+
 
 const getMembersAverageAge = (players) => {
 	let ages = 0, i = 0;
@@ -11,4 +18,4 @@ const getMembersAverageAge = (players) => {
 	return ages / i;
 }
 
-module.exports = { getCurrentAge, getMembersAverageAge }
+module.exports = { getCurrentAge, getMembersAverageAge, isValidPassword }

@@ -65,4 +65,10 @@ const News = mongoose.model('news', {
   sportTypeCode: { type: Number, require: true }
 });
 
-module.exports = { Player, Team, News };
+const Admin = mongoose.model('admins', {
+  login: { type: String, require: true },
+
+  password: { type: String, require: true }
+})
+
+module.exports = { Player, Team, News, Admin };

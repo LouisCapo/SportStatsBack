@@ -6,6 +6,7 @@ const logger = require('morgan');
 const playerRouter = require('./routes/player');
 const teamRouter = require('./routes/team')
 const newsRouter = require('./routes/news');
+const authRouter = require('./routes/auth')
 
 const app = express();
 
@@ -30,5 +31,6 @@ app.use((req, res, next) => {
 app.use('/api/players/', playerRouter);
 app.use('/api/teams/', teamRouter);
 app.use('/api/news/', newsRouter);
+app.use('/api/auth', authRouter);
 
 module.exports = app;
