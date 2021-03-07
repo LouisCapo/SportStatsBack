@@ -71,4 +71,10 @@ const Admin = mongoose.model('admins', {
   password: { type: String, require: true }
 })
 
-module.exports = { Player, Team, News, Admin };
+const Sports = mongoose.model('sports', {
+  sportTitle: { type: String, require: true, unique: true},
+
+  sportCode: { type: Number, require: true, unique: true }
+})
+
+module.exports = { Player, Team, News, Admin, Sports };

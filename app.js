@@ -4,9 +4,10 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
 const playerRouter = require('./routes/player');
-const teamRouter = require('./routes/team')
+const teamRouter = require('./routes/team');
 const newsRouter = require('./routes/news');
-const authRouter = require('./routes/auth')
+const authRouter = require('./routes/auth');
+const sportRouter = require('./routes/sport');
 
 const app = express();
 
@@ -32,5 +33,6 @@ app.use('/api/players/', playerRouter);
 app.use('/api/teams/', teamRouter);
 app.use('/api/news/', newsRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/sport', sportRouter);
 
 module.exports = app;

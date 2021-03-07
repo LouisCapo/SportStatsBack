@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../model/db');
 const config = require('config');
 const helper = require('../services/helper');
+const isAuthenticated = require('../controllers/auth');
 
 router.post('/login', (req, res, next) => {
   try {
@@ -53,5 +54,28 @@ router.post('/login', (req, res, next) => {
         }).status(500);
   }
 });
+
+router.get('/isAdmin', isAuthenticated, async (req, res, next) => {
+  try {
+    const isAdmin = await helper.isUserAdmin(req.user.id)
+    console.log(isAdmin)
+    if (isAdmin) {
+      return res.send({
+        error: {
+          code: 1,
+          msg: 'Нет доступа!',
+        },
+      }).status(403);
+    }
+    return res.send({Ok: 1}).status(200);
+  } catch(err) {
+    return res.send({
+      error: {
+        code: 1,
+        msg: 'Нет доступа!',
+      },
+    }).status(403);
+  }
+})
 
 module.exports = router;

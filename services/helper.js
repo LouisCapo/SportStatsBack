@@ -1,4 +1,5 @@
 const bCrypt = require('bcrypt');
+const db = require('../model/db');
 
 const getCurrentAge = (birthday) => {
   return Math.floor(((new Date().getTime() - new Date(birthday)) / (24 * 3600 * 365.25 * 1000)) | 0);
@@ -18,4 +19,13 @@ const getMembersAverageAge = (players) => {
 	return ages / i;
 }
 
-module.exports = { getCurrentAge, getMembersAverageAge, isValidPassword }
+const isUserAdmin = (id) => {
+	db.Admin.findById(id).then((admin) => {
+		if (admin) {
+			return true;
+		}
+		return false;
+	});
+}
+
+module.exports = { getCurrentAge, getMembersAverageAge, isValidPassword, isUserAdmin }

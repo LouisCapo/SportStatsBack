@@ -68,8 +68,17 @@ router.get('/get-player', (req, res, next) => {
   }
 });
 
-router.post('/create-player', isAuthenticated, (req, res, next) => {
+router.post('/create-player', isAuthenticated, async (req, res, next) => {
   try {
+    const isAdmin = await helper.isUserAdmin(req.user.id)
+    if (isAdmin) {
+      return res.send({
+        error: {
+          code: 1,
+          msg: 'Нет доступа!',
+        },
+      }).status(403);
+    } 
     const {
       playerName,
       playerNick,
@@ -89,44 +98,33 @@ router.post('/create-player', isAuthenticated, (req, res, next) => {
           },
         }).status(400);
     }
-    const adminId = req.user.id;
-    db.Admin.findById(adminId).then((admin) => {
-      if (admin) {
-        const data = {
-          playerName: playerName,
-          playerNick: playerNick,
-          playerPhoto: playerPhoto,
-          playerBirthday: playerBirthday,
-          playerTeam: playerTeam,
-          playerAchievements: playerAchievements,
-          playerStats: playerStats,
-          sportType: sportType,
-          sportTypeCode: sportTypeCode,
-        };
-        const newPlayer = new db.Player(data);
-        newPlayer
-          .save()
-          .then((player) => {
-            return res.send({
-                playerId: player._id,
-              }).status(200);
-          })
-          .catch(() => {
-            return res.send({
-                error: {
-                  code: 2,
-                  msg: 'Не удалось сохранить игрока!',
-                },
-              }).status(400);
-          });
-      }
-      return res.send({
-          error: {
-            code: 1,
-            msg: 'Нет доступа!',
-          },
-        }).status(403);
-    });
+    const data = {
+      playerName: playerName,
+      playerNick: playerNick,
+      playerPhoto: playerPhoto,
+      playerBirthday: playerBirthday,
+      playerTeam: playerTeam,
+      playerAchievements: playerAchievements,
+      playerStats: playerStats,
+      sportType: sportType,
+      sportTypeCode: sportTypeCode,
+    };
+    const newPlayer = new db.Player(data);
+    newPlayer
+      .save()
+      .then((player) => {
+        return res.send({
+            playerId: player._id,
+          }).status(200);
+      })
+      .catch(() => {
+        return res.send({
+            error: {
+              code: 2,
+              msg: 'Не удалось сохранить игрока!',
+            },
+          }).status(400);
+      });
   } catch (error) {
     res.send({
         error: {
