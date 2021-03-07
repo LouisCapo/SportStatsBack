@@ -28,7 +28,7 @@ const Player = mongoose.model('players', {
 
   playerAchievements: [{ label: String, newsId: String }],
 
-  playerStats: [{ type: Object }],
+  playerStats: [{ title: String, value: String }],
 
   sportType: { type: String, require: true },
 
