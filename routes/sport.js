@@ -47,13 +47,7 @@ router.post('/create-sport-type', isAuthenticated, async (req, res, next) => {
       }).status(400);
     }
     const lastSportType = await db.Sports.findOne().sort({'_id':-1});
-    let newSportCode;
-    console.log(lastSportType)
-    if (lastSportType) {
-      newSportCode = lastSportType.sportCode + 1;
-    } else {
-      newSportCode = 0;
-    }
+    let newSportCode = lastSportType ? lastSportType.sportCode + 1 : 0;
     const data = {
       sportTitle: sportTitle,
       sportCode: newSportCode
@@ -62,7 +56,7 @@ router.post('/create-sport-type', isAuthenticated, async (req, res, next) => {
     const newSportType = new db.Sports(data);
     newSportType.save().then(newSport => {
       res.send(newSport).status(200);
-    }).catch(err => {
+    }).catch(() => {
       return res.send({
         error: {
           code: 1,
@@ -71,7 +65,6 @@ router.post('/create-sport-type', isAuthenticated, async (req, res, next) => {
       }).status(400);
     })
   } catch(err) {
-    console.log(err);
     return res.send({
       error: {
         code: 0,

@@ -21,10 +21,7 @@ const getMembersAverageAge = (players) => {
 
 const isUserAdmin = (id) => {
 	db.Admin.findById(id).then((admin) => {
-		if (admin) {
-			return true;
-		}
-		return false;
+		return !!admin;
 	});
 }
 
