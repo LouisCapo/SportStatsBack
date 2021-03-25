@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../model/db');
-const helper = require('../services/helper');
 const isAuthenticated = require('../controllers/auth');
+const PlayerService = require('../services/player.service');
+const AuthService = require('../services/auth.service');
+const HelperService = require('../services/helper.service');
 
-router.get('/get-player', (req, res, next) => {
+const playerService = new PlayerService();
+const authService = new AuthService();
+const helperService = new HelperService();
+
+router.get('/get-player', async (req, res, next) => {
   try {
     const { id } = req.query;
     if (id.length !== 24) {
@@ -17,45 +22,32 @@ router.get('/get-player', (req, res, next) => {
         })
         .status(400);
     }
-    db.Player.findById(id)
-      .populate('playerTeam')
-      .then((currentPlayer) => {
-        if (!currentPlayer) {
-          return res
-            .send({
-              error: {
-                code: 1,
-                msg: 'Игрок не найден!',
-              },
-            })
-            .status(404);
-        }
-        const data = {
-          playerName: currentPlayer.playerName,
-          playerNick: currentPlayer.playerNick,
-          playerId: currentPlayer._id,
-          playerPhoto: currentPlayer.playerPhoto,
-          playerAge: helper.getCurrentAge(currentPlayer.playerBirthday),
-          playerTeam: {
-            teamName: currentPlayer.playerTeam.teamName,
-            teamId: currentPlayer.playerTeam._id,
-            teamLogo: currentPlayer.playerTeam.teamLogo,
-          },
-          playerStats: currentPlayer.playerStats,
-          playerAchievements: currentPlayer.playerAchievements,
-        };
-        return res.send(data).status(200);
-      })
-      .catch((err) => {
-        res
-          .send({
-            error: {
-              code: 1,
-              msg: 'Игрок не найден!',
-            },
-          })
-          .status(404);
-      });
+    playerService.getPlayerById(id).then(player => {
+      console.log(player);
+      const data = {
+        playerId: player._id,
+        playerName: player.playerName ? player.playerName : null,
+        playerNick: player.playerNick ? player.playerNick : null,
+        playerPhoto: player.playerPhoto ? player.playerPhoto: null,
+        playerAge: player.playerBirthday ? helperService.getCurrentAge(player.playerBirthday) : null,
+        playerTeam: player.playerTeam ? {
+          teamName: player.playerTeam.teamName,
+          teamId: player.playerTeam._id,
+          teamLogo: player.playerTeam.teamLogo,
+        } : null,
+        playerAchievements: player.playerAchievements ? player.playerAchievements : null,
+        playerStats: player.playerStats ? player.playerStats : null,
+        sportType: player.sportType ? {
+          title: player.sportType.sportTitle,
+          code: player.sportType.sportCode,
+        } : null,
+      }
+      return res.send(data).status(200);
+    }).catch(err => {
+      return res.send({
+        error: err.error,
+      }).status(err.status);
+    })
   } catch (error) {
     res
       .send({
@@ -70,7 +62,7 @@ router.get('/get-player', (req, res, next) => {
 
 router.post('/create-player', isAuthenticated, async (req, res, next) => {
   try {
-    const isAdmin = await helper.isUserAdmin(req.user.id)
+    const isAdmin = await authService.isUserAdmin(req.user.id);
     if (isAdmin) {
       return res.send({
         error: {
@@ -87,7 +79,6 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
       playerTeam,
       playerAchievements,
       playerStats,
-      sportType,
       sportTypeCode,
     } = req.body;
     if (!playerName) {
@@ -106,25 +97,17 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
       playerTeam: playerTeam,
       playerAchievements: playerAchievements,
       playerStats: playerStats,
-      sportType: sportType,
       sportTypeCode: sportTypeCode,
     };
-    const newPlayer = new db.Player(data);
-    newPlayer
-      .save()
-      .then((player) => {
-        return res.send({
-            playerId: player._id,
-          }).status(200);
-      })
-      .catch(() => {
-        return res.send({
-            error: {
-              code: 2,
-              msg: 'Не удалось сохранить игрока!',
-            },
-          }).status(400);
-      });
+    playerService.createPlayer(data).then(newPlayer => {
+      res.send({
+        playerId: newPlayer._id,
+      }).status(200);
+    }).catch(err => {
+      return res.send({
+        error: err.error,
+      }).status(err.status);
+    })
   } catch (error) {
     res.send({
         error: {

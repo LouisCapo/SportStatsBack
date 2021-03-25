@@ -2,7 +2,11 @@ const express = require('express');
 const router = express.Router();
 const db = require('../model/db');
 const isAuthenticated = require('../controllers/auth');
-const helper = require('../services/helper');
+const AuthService = require('../services/auth.service');
+const SportService = require('../services/sport.service');
+
+const authService = new AuthService();
+const sportService = new SportService();
 
 router.get('/sport-list', (req, res, next) => { 
   try {
@@ -28,7 +32,7 @@ router.get('/sport-list', (req, res, next) => {
 
 router.post('/create-sport-type', isAuthenticated, async (req, res, next) => {
   try {
-    const isAdmin = await helper.isUserAdmin(req.user.id)
+    const isAdmin = await authService.isUserAdmin(req.user.id);
     if (isAdmin) {
       return res.send({
         error: {

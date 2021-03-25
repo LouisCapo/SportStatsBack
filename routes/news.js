@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../model/db');
-const helper = require('../services/helper');
+const NewsService = require('../services/news.service');
+
+const newsService = new NewsService();
 
 router.get('/get-news', (req, res, next) => {
   try {
@@ -14,34 +16,30 @@ router.get('/get-news', (req, res, next) => {
           },
         }).status(400);
     }
-    db.News.findById(id)
+    newsService
+      .getNewsById(id)
       .then((currentNews) => {
-        if (!currentNews) {
-          return res.send({
-              error: {
-                code: 1,
-                msg: 'Новость не найдена!',
-              },
-            }).status(404);
-        }
         const data = {
           newsId: currentNews._id,
-          newsTitle: currentNews.title,
-          newsSubtitle: currentNews.subtitle,
-          newsText: currentNews.newsText,
-          newsDate: currentNews.date,
-          newsPhotos: currentNews.photos ? currentNews.photos : null,
+          newsTitle: currentNews.title ? currentNews.title : null,
+          newsSubtitle: currentNews.subtitle ? currentNews.subtitle : null,
+          newsText: currentNews.newsText ? currentNews.newsText : null,
+          newsDate: currentNews.date ? currentNews.date : null,
+          newsPhotos: currentNews.photos ? currentNews.photos : [],
           sportType: currentNews.sportType
+            ? {
+                title: currentNews.sportType.sportTitle,
+                code: currentNews.sportType.sportCode,
+              }
+            : null,
         };
-        res.send(data).status(200);
+        return res.send(data).status(200);
       })
       .catch((err) => {
         return res.send({
-            error: {
-              code: 1,
-              msg: 'Новость не найдена!',
-            },
-          }).status(404);
+            error: err.error,
+          })
+        .status(err.status);
       });
   } catch (err) {
     return res.send({

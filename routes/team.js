@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../model/db');
-const helper = require('../services/helper');
+const HelperService = require('../services/helper.service');
+
+const helperService = new HelperService();
 
 router.get('/get-team', (req, res, next) => {
   try {
@@ -41,7 +43,7 @@ router.get('/get-team', (req, res, next) => {
           teamMembers: teamMembers,
           teamStats: currentTeam.teamStats,
           sportType: currentTeam.sportType,
-          memberAverageAge: helper.getMembersAverageAge(
+          memberAverageAge: helperService.getMembersAverageAge(
             currentTeam.teamMembers
           ),
         };

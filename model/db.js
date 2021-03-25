@@ -30,9 +30,8 @@ const Player = mongoose.model('players', {
 
   playerStats: [{ title: String, value: String }],
 
-  sportType: { type: String, require: true },
+  sportType: { type: Schema.Types.ObjectId, ref: 'sports'},
 
-  sportTypeCode: { type: Number, require: true }
 });
 
 const Team = mongoose.model('teams', {
@@ -60,9 +59,7 @@ const News = mongoose.model('news', {
 
   photos: [{ type: String }],
 
-  sportType: { type: String, require: true },
-
-  sportTypeCode: { type: Number, require: true }
+  sportTypeCode: { type: Number},
 });
 
 const Admin = mongoose.model('admins', {
