@@ -10,15 +10,19 @@ const sportService = new SportService();
 
 router.get('/sport-list', (req, res, next) => { 
   try {
-    db.Sports.find({}).then(sportList => {
+    sportService.getSportList().then(list => {
+      const sportList = [];
+      list.forEach(el => {
+        sportList.push({
+          code: el.sportCode,
+          title: el.sportTitle 
+        })
+      })
       return res.send(sportList).status(200);
     }).catch(err => {
       return res.send({
-        error: {
-          code: 1,
-          msg: 'Не найдены виды спорта!',
-        },
-      }).status(404);
+        error: err.error,
+      }).status(err.status);
     })
   } catch(err) {
     return res.send({

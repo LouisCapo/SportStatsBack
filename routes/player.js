@@ -23,19 +23,18 @@ router.get('/get-player', async (req, res, next) => {
         .status(400);
     }
     playerService.getPlayerById(id).then(player => {
-      console.log(player);
       const data = {
         playerId: player._id,
         playerName: player.playerName ? player.playerName : null,
         playerNick: player.playerNick ? player.playerNick : null,
         playerPhoto: player.playerPhoto ? player.playerPhoto: null,
+        playerBirthday: player.playerBirthday ? player.playerBirthday : null,
         playerAge: player.playerBirthday ? helperService.getCurrentAge(player.playerBirthday) : null,
         playerTeam: player.playerTeam ? {
           teamName: player.playerTeam.teamName,
           teamId: player.playerTeam._id,
           teamLogo: player.playerTeam.teamLogo,
         } : null,
-        playerAchievements: player.playerAchievements ? player.playerAchievements : null,
         playerStats: player.playerStats ? player.playerStats : null,
         sportType: player.sportType ? {
           title: player.sportType.sportTitle,
@@ -76,8 +75,7 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
       playerNick,
       playerPhoto,
       playerBirthday,
-      playerTeam,
-      playerAchievements,
+      playerTeamId,
       playerStats,
       sportTypeCode,
     } = req.body;
@@ -94,8 +92,7 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
       playerNick: playerNick,
       playerPhoto: playerPhoto,
       playerBirthday: playerBirthday,
-      playerTeam: playerTeam,
-      playerAchievements: playerAchievements,
+      playerTeam: playerTeamId,
       playerStats: playerStats,
       sportTypeCode: sportTypeCode,
     };

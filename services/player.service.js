@@ -1,4 +1,7 @@
 const db = require('../model/db');
+const SportService = require('../services/sport.service');
+
+const sportService = new SportService();
 
 class PlayerService {
   constructor() {}
@@ -44,19 +47,18 @@ class PlayerService {
         playerBirthday: player.playerBirthday ? player.playerBirthday : null,
         playerTeam: player.playerTeam ? player.playerTeam : null,
         playerPhoto: player.playerPhoto ? player.playerPhoto : null,
-        playerAchievements: player.playerAchievements ? player.playerAchievements : [],
         playerStats: player.playerStats ? player.playerStats : [],
         sportType: null,
       }
       if (player.sportTypeCode !== undefined && player.sportTypeCode !== null) {
-        const playerSport = await db.Sports.findOne({ sportCode: player.sportTypeCode });
+        const playerSport = await sportService.getSportTypeByCode(player.sportTypeCode);
         data.sportType = playerSport._id;
       }
-      const newPlayer = new db.Player(player);
+      const newPlayer = new db.Player(data);
       newPlayer
         .save()
-        .then((player) => {
-          return resolve(player);
+        .then((newPlayer) => {
+          return resolve(newPlayer);
         })
         .catch(() => {
           return reject({
