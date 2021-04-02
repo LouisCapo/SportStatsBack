@@ -55,7 +55,7 @@ const News = mongoose.model('news', {
 
   date: { type: String, require: true },
 
-  photos: [{ type: String }],
+  photo: { type: String },
 
   sportTypeCode: { type: Number},
 });
