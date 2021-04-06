@@ -98,7 +98,7 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
     };
     playerService.createPlayer(data).then(newPlayer => {
       res.send({
-        playerId: newPlayer._id,
+        id: newPlayer._id,
       }).status(200);
     }).catch(err => {
       return res.send({
