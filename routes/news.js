@@ -1,7 +1,8 @@
 const express = require('express');
 const isAuthenticated = require('../controllers/auth');
 const router = express.Router();
-const db = require('../model/db');
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
 const AuthService = require('../services/auth.service');
 const NewsService = require('../services/news.service');
 
@@ -107,7 +108,7 @@ router.get('/get-news-list', (req, res, next) => {
   }
 });
 
-router.post('/create-news', isAuthenticated, async (req, res, next) => {
+router.post('/create-news', isAuthenticated, upload.single('photo'), async (req, res, next) => {
   const isAdmin = await authService.isUserAdmin(req.user.id);
   if (isAdmin) {
     return res.send({
@@ -139,6 +140,10 @@ router.post('/create-news', isAuthenticated, async (req, res, next) => {
     newsText: newsText,
     newsPhoto: newsPhoto,
   }).then(newNews => {
+    if (req.file) {
+      console.log(54321)
+      newsService.saveNewsPhoto(req.file);
+    }
     return res.send({ id: newNews._id });
   }).catch(err => {
     return res.send({
