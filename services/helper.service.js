@@ -12,12 +12,15 @@ class HelperService {
 	};
 
 	getMembersAverageAge(players) {
-		let ages = 0, i = 0;
+		let ages = 0;
 		players.forEach(res => {
 			ages += this.getCurrentAge(res.playerBirthday);
-			i++; 
-		})
-		return ages / i;
+		});
+		return ages / players.length;
+	}
+
+	isNullOrUndefined(value) {
+		return value === undefined || value === null;
 	}
 
 }

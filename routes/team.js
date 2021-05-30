@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const db = require('../model/db');
 const HelperService = require('../services/helper.service');
+const TeamService = require('../services/team.service');
 
 const helperService = new HelperService();
+const teamService = new TeamService();
 
 router.get('/get-team', (req, res, next) => {
   try {
@@ -16,47 +18,32 @@ router.get('/get-team', (req, res, next) => {
           },
         }).status(400);
     }
-    db.Team.findById(id)
-      .populate('teamMembers')
-      .then((currentTeam) => {
-        if (!currentTeam) {
-          return res.send({
-              error: {
-                code: 1,
-                msg: 'Команда не найдена!',
-              },
-            }).status(404);
-        }
-        const teamMembers = [];
-        currentTeam.teamMembers.forEach((el) => {
-          teamMembers.push({
-            memberName: el.playerName,
-            memberNick: el.playerNick,
-            memberId: el._id,
-            memberPhoto: el.playerPhoto,
-          });
-        });
-        const data = {
-          teamId: currentTeam._id,
-          teamName: currentTeam.teamName,
-          teamLogo: currentTeam.teamLogo,
-          teamMembers: teamMembers,
-          teamStats: currentTeam.teamStats,
-          sportType: currentTeam.sportType,
-          memberAverageAge: helperService.getMembersAverageAge(
-            currentTeam.teamMembers
-          ),
-        };
-        res.send(data).status(200);
-      })
-      .catch((err) => {
-        return res.send({
-            error: {
-              code: 1,
-              msg: 'Команда не найдена!',
-            },
-          }).status(404);
-      });
+    teamService.getTeamById(id).then(currentTeam => {
+      const data = {
+        teamId: currentTeam._id,
+        teamName: currentTeam.teamName,
+        teamLogo: currentTeam.teamLogo ? currentTeam.teamLogo : null,
+        teamMembers: currentTeam.teamMembers.length ? currentTeam.teamMembers.map(player => {
+          return {
+            memberName: player.playerName ? player.playerName : null,
+            memberNick: player.playerNick ? player.playerNick : null,
+            memberPhoto: player.playerPhoto ? player.playerPhoto : null,
+            memberId: player._id,
+          }
+        }) : [],
+        teamStats: currentTeam.teamStats ? currentTeam.teamStats : [],
+        sportType: currentTeam.sportType ? {
+          sportTypeCode: currentTeam.sportType.sportCode,
+          sportTypeTitle: currentTeam.sportType.sportTitle
+        } : null,
+        memberAverageAge: currentTeam.teamMembers ? helperService.getMembersAverageAge(currentTeam.teamMembers) : null,
+      }
+      return res.send(data).status(200);
+    }).catch(err => {
+      return res.send({
+        error: err.error,
+      }).status(err.status);
+    })
   } catch (err) {
     return res.send({
         error: {
