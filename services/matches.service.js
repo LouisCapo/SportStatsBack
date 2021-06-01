@@ -72,6 +72,17 @@ class MatchesService {
 
   createNewMatch(matchInfo) {
     return new Promise(async (resolve, reject) => {
+      const firstTeam = await db.Team.find({_id: matchInfo.firstTeamId});
+      const secondTeam = await db.Team.find({_id: matchInfo.secondTeamId});
+      if (!firstTeam[0] || !secondTeam[0]) {
+        return reject({
+          error: {
+            code: 3,
+            msg: 'Команды не существуют!',
+          },
+          status: 400,
+        });
+      }
       const data = {
         firstTeam: matchInfo.firstTeamId,
         secondTeam: matchInfo.secondTeamId,

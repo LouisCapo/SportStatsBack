@@ -139,7 +139,7 @@ router.post('/create-match', isAuthenticated, async (req, res, next) => {
     }).status(400);
   }
   matchesService.createNewMatch({firstTeamId, secondTeamId, date, score, isCompleted, sportTypeCode}).then(currentMatch => {
-    return res.send({matchId: currentMatch._id}).status(200);
+    return res.send({id: currentMatch._id}).status(200);
   }).catch(err => {
     return res.send({
       error: err.error,
