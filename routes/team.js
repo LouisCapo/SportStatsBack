@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../model/db');
+const isAuthenticated = require('../controllers/auth');
+const AuthService = require('../services/auth.service');
 const HelperService = require('../services/helper.service');
 const TeamService = require('../services/team.service');
 
 const helperService = new HelperService();
 const teamService = new TeamService();
+const authService = new AuthService();
 
 router.get('/get-team', (req, res, next) => {
   try {
@@ -53,5 +56,42 @@ router.get('/get-team', (req, res, next) => {
       }).status(500);
   }
 });
+
+router.post('/create-team', isAuthenticated, async (req, res, next) => {
+  const isAdmin = await authService.isUserAdmin(req.user.id);
+  if (isAdmin) {
+    return res.send({
+      error: {
+        code: 1,
+        msg: 'Нет доступа!',
+      },
+    }).status(403);
+  } 
+  const {
+    teamName,
+    teamLogo,
+    sportTypeCode,
+  } = req.body;
+  if (!teamName || !sportTypeCode) {
+    return res.send({
+      error: {
+        code: 2,
+        msg: 'Не указанны обязательные поля!',
+      },
+    }).status(400);
+  }
+  const data = {
+    teamName,
+    teamLogo: teamLogo ? teamLogo : null,
+    sportTypeCode,
+  }
+  teamService.createTeam(data).then(currentTeam => {
+    return res.send({id: currentTeam._id});
+  }).catch(err => {
+    return res.send({
+      error: err.error,
+    }).status(err.status);
+  })
+})
 
 module.exports = router;

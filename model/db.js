@@ -30,7 +30,7 @@ const Team = mongoose.model('teams', {
   teamName: { type: String, require: true },
   teamLogo: { type: String },
   teamMembers: [{ type: Schema.Types.ObjectId, ref: 'players' }],
-  teamStats: [{ type: Object }],
+  teamStats: [{ title: String, value: String }],
   sportType: { type: Schema.Types.ObjectId, ref: 'sports'},
 });
 

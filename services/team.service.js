@@ -1,4 +1,7 @@
 const db = require('../model/db');
+const SportService = require('../services/sport.service');
+
+const sportService = new SportService();
 
 class TeamService {
   constructor() { }
@@ -32,6 +35,31 @@ class TeamService {
         });
       });
     });
+  }
+
+  createTeam(teamInfo) {
+    return new Promise(async (resolve, reject) => {
+      const sportType = await sportService.getSportTypeByCode(teamInfo.sportTypeCode);
+      const data = {
+        teamName: teamInfo.teamName,
+        teamLogo: teamInfo.teamLogo ? teamInfo.teamLogo : null,
+        teamMembers: [],
+        teamStats: [],
+        sportType: sportType._id,
+      }
+      const newTeam = new db.Team(data);
+      newTeam.save().then(currentTeam => {
+        return resolve(currentTeam);
+      }).catch(err => {
+        return reject({
+          error: {
+            code: 2,
+            msg: 'Не удалось сохранить новыую команду!',
+          },
+          status: 400,
+        });
+      })
+    })
   }
 }
 
