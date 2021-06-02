@@ -44,7 +44,7 @@ router.get('/get-coincidence', async (req, res, next) => {
       photo: item.playerPhoto ? item.playerPhoto : null,
     }
   }))
-  return res.send([].concat(...data).slice(0, 10)).status(200);
+  return res.send({data: [].concat(...data).slice(0, 10)}).status(200);
 })
 
 module.exports = router;
