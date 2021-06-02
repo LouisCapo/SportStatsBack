@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const db = require('../model/db');
 const isAuthenticated = require('../controllers/auth');
 const AuthService = require('../services/auth.service');
 const HelperService = require('../services/helper.service');
@@ -92,6 +91,48 @@ router.post('/create-team', isAuthenticated, async (req, res, next) => {
       error: err.error,
     }).status(err.status);
   })
+});
+
+router.put('/edit-team', isAuthenticated, async (req, res, next) => {
+  const isAdmin = await authService.isUserAdmin(req.user.id);
+  if (isAdmin) {
+    return res.send({
+      error: {
+        code: 1,
+        msg: 'Нет доступа!',
+      },
+    }).status(403);
+  } 
+  const {
+    teamId,
+    teamName,
+    teamLogo,
+    sportTypeCode,
+    memberList
+  } = req.body
+  if (teamId.length !== 24) {
+    return res.send({
+      error: {
+        code: 1,
+        msg: 'Неверный формат teamId!',
+      },
+    }).status(400);
+  }
+  if (helperService.isNullOrUndefined(teamName) || helperService.isNullOrUndefined(sportTypeCode)) {
+    return res.send({
+      error: {
+        code: 2,
+        msg: 'Не указанны обязательные поля!',
+      },
+    }).status(400);
+  }
+  teamService.editTeam({teamId, teamName, teamLogo, sportTypeCode, memberList}).then(currentTeam => {
+    return res.send({Ok: 1}).status(200);
+  }).catch(err => {
+    return res.send({
+      error: err.error,
+    }).status(err.status);
+  });
 })
 
 module.exports = router;

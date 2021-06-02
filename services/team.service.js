@@ -61,6 +61,38 @@ class TeamService {
       })
     })
   }
+
+  editTeam(teamInfo) {
+    return new Promise(async (resolve, reject) => {
+      const sportType = await sportService.getSportTypeByCode(teamInfo.sportTypeCode);
+      let currentTeam = await db.Team.findById({_id: teamInfo.teamId});
+      if (!currentTeam) {
+        return reject({
+          error: {
+            code: 2,
+            msg: 'Не удалось найти команду!',
+          },
+          status: 400,
+        });
+      }
+      currentTeam.teamName = teamInfo.teamName;
+      currentTeam.sportType = sportType._id;
+      currentTeam.teamLogo = teamInfo.teamLogo ? teamInfo.teamLogo : null,
+      currentTeam.teamStats = teamInfo.teamStats ? teamInfo.teamStats : [],
+      currentTeam.teamMembers = teamInfo.memberList ? teamInfo.memberList : [],
+      currentTeam.save().then(updatedTeam => {
+        return resolve(updatedTeam);
+      }).catch(err => {
+        return reject({
+          error: {
+            code: 2,
+            msg: 'Не удалось сохранить информацию по команде!',
+          },
+          status: 501,
+        });
+      });
+    });
+  }
 }
 
 module.exports = TeamService;
