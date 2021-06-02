@@ -4,10 +4,12 @@ const isAuthenticated = require('../controllers/auth');
 const AuthService = require('../services/auth.service');
 const HelperService = require('../services/helper.service');
 const TeamService = require('../services/team.service');
+const SearchService = require('../services/search.service')
 
 const helperService = new HelperService();
 const teamService = new TeamService();
 const authService = new AuthService();
+const searchService = new SearchService();
 
 router.get('/get-team', (req, res, next) => {
   try {

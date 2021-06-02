@@ -9,6 +9,7 @@ const newsRouter = require('./routes/news');
 const authRouter = require('./routes/auth');
 const sportRouter = require('./routes/sport');
 const gamesRouter = require('./routes/games');
+const searchRouter = require('./routes/search')
 
 const app = express();
 
@@ -36,5 +37,6 @@ app.use('/api/news/', newsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/sport', sportRouter);
 app.use('/api/games', gamesRouter);
+app.use('/api/search', searchRouter);
 
 module.exports = app;
