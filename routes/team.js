@@ -4,12 +4,13 @@ const isAuthenticated = require('../controllers/auth');
 const AuthService = require('../services/auth.service');
 const HelperService = require('../services/helper.service');
 const TeamService = require('../services/team.service');
-const SearchService = require('../services/search.service')
+const SearchService = require('../services/search.service');
+const MatchesService = require('../services/matches.service');
 
 const helperService = new HelperService();
 const teamService = new TeamService();
 const authService = new AuthService();
-const searchService = new SearchService();
+const matchesService = new MatchesService();
 
 router.get('/get-team', (req, res, next) => {
   try {
@@ -22,7 +23,27 @@ router.get('/get-team', (req, res, next) => {
           },
         }).status(400);
     }
-    teamService.getTeamById(id).then(currentTeam => {
+    teamService.getTeamById(id).then(async currentTeam => {
+      const matchesList = await matchesService.getTeamUpcomingMatches(currentTeam);
+      const mathesResponse = matchesList.map(item => {
+        return {
+          matchId: item._id,
+          firstTeam: {
+            teamId: item.firstTeam._id,
+            teamName: item.firstTeam.teamName,
+            teamLogo: item.firstTeam.teamLogo ? item.firstTeam.teamLogo : null, 
+          },
+          secondTeam: {
+            teamId: item.secondTeam._id,
+            teamName: item.secondTeam.teamName,
+            teamLogo: item.secondTeam.teamLogo ? item.secondTeam.teamLogo : null, 
+          },
+          score: {
+            firstTeam: helperService.isNullOrUndefined(item.score.firstTeam) ? null : item.score.firstTeam,
+            secondTeam: helperService.isNullOrUndefined(item.score.secondTeam) ? null : item.score.secondTeam,
+          } 
+        }
+      })
       const data = {
         teamId: currentTeam._id,
         teamName: currentTeam.teamName,
@@ -41,6 +62,7 @@ router.get('/get-team', (req, res, next) => {
           sportTypeTitle: currentTeam.sportType.sportTitle
         } : null,
         memberAverageAge: currentTeam.teamMembers ? helperService.getMembersAverageAge(currentTeam.teamMembers) : null,
+        lastMatches: mathesResponse,
       }
       return res.send(data).status(200);
     }).catch(err => {

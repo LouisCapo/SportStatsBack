@@ -56,7 +56,7 @@ const Sports = mongoose.model('sports', {
 const Matches = mongoose.model('matches', {
   firstTeam: { type: Schema.Types.ObjectId, ref: 'teams', require: true},
   secondTeam: { type: Schema.Types.ObjectId, ref: 'teams', require: true},
-  score: [{fistTeam: Number, secondTeam: Number}],
+  score: {firstTeam: Number, secondTeam: Number},
   date: { type: Date },
   sportType: { type: Schema.Types.ObjectId, ref: 'sports', require: true },
   isCompleted: { type: Boolean }

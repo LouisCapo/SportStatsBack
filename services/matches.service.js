@@ -1,7 +1,9 @@
 const db = require('../model/db');
 const SportService = require('../services/sport.service');
+const HelperService = require('./helper.service')
 
 const sportService = new SportService();
+const helperService = new HelperService();
 
 class MatchesService {
   constructor() { }
@@ -37,7 +39,7 @@ class MatchesService {
   getMatchesList(sportTypeCode, offset, limit, isCompleted) {
     return new Promise(async (resolve, reject) => {
       const sportType = await sportService.getSportTypeByCode(sportTypeCode);
-      db.Matches.find({isCompleted: isCompleted, sportType: sportType._id }).sort({date: 1}).skip(offset * limit).limit(limit).then(async (list) => {    
+      db.Matches.find({isCompleted: isCompleted, sportType: sportType._id }).sort({date: 1}).skip(offset * limit).limit(limit).then(async (list) => {   
         if (list.length) {
           return Promise.all(
             list.map(async (item) => {
@@ -54,7 +56,7 @@ class MatchesService {
         return reject({
           error: {
             code: 1,
-            msg: 'Матчи не найден!',
+            msg: 'Матчи не найдены!',
           },
           status: 404,
         });
@@ -62,7 +64,7 @@ class MatchesService {
         return reject({
           error: {
             code: 1,
-            msg: 'Матчи не найден!',
+            msg: 'Матчи не найдены!',
           },
           status: 404,
         });
@@ -89,8 +91,8 @@ class MatchesService {
         date: matchInfo.date ? matchInfo.date : null,
         isCompleted: matchInfo.isCompleted ? matchInfo.isCompleted : false,
         score: {
-          firstTeam: matchInfo.score.firstTeam ? matchInfo.score.firstTeam : null,
-          secondTeam: matchInfo.score.secondTeam ? matchInfo.score.secondTeam : null,
+          firstTeam: helperService.isNullOrUndefined(matchInfo.score.firstTeam) ? null : matchInfo.score.firstTeam,
+          secondTeam: helperService.isNullOrUndefined(matchInfo.score.secondTeam) ? null : matchInfo.score.secondTeam,
         },
         sportType: await sportService.getSportTypeByCode(matchInfo.sportTypeCode),
       };
@@ -110,6 +112,29 @@ class MatchesService {
           });
         });
     })
+  }
+
+  getTeamUpcomingMatches(teamId) {
+    return new Promise((resolve, reject) => {
+      db.Matches.find({$or: [{firstTeam: teamId}, {secondTeam: teamId}], isCompleted: true}).sort({date: 1}).limit(10).then(matchesList => {
+        if (matchesList.length) {
+          return Promise.all(
+            matchesList.map(async (item) => {
+              let populatedItem = item;
+              await populatedItem.populate('firstTeam').execPopulate();
+              await populatedItem.populate('secondTeam').execPopulate();
+              await populatedItem.populate('sportType').execPopulate();
+              return populatedItem;
+            })
+          ).then((result) => {
+            return resolve(result);
+          });
+        }
+        return resolve([]);
+      }).catch(err => {
+        return resolve([]);
+      });
+    });
   }
 }
 

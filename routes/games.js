@@ -54,7 +54,7 @@ router.get('/games-list', (req, res, next) => {
         },
       }
     });
-    return res.send(data).status(200);
+    return res.send({data: data}).status(200);
   }).catch(err => {
     console.log(err)
     return res.send({
@@ -122,7 +122,9 @@ router.post('/create-match', isAuthenticated, async (req, res, next) => {
     isCompleted,
     sportTypeCode
   } = req.body;
-  if (!firstTeamId || !secondTeamId || !sportTypeCode) {
+  if (helperService.isNullOrUndefined(firstTeamId) || 
+      helperService.isNullOrUndefined(secondTeamId) || 
+      helperService.isNullOrUndefined(sportTypeCode)) {
     return res.send({
       error: {
         code: 1,
