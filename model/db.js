@@ -1,15 +1,14 @@
 const mongoose = require('mongoose');
-const config = require('config');
 const Schema = mongoose.Schema;
 
 mongoose.set('useCreateIndex', true);
 mongoose
-  .connect(config.get('mongoUri'), {
+  .connect(process.env.mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log('Successful connection');
+    console.log('Successful connection to MongoDB');
   })
   .catch((err) => {
     console.error('Can t connect to db', err);

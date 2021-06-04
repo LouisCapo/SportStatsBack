@@ -1,6 +1,5 @@
 const db = require('../model/db');
 const jwt = require('jsonwebtoken');
-const config = require('config');
 const HelperService = require('./helper.service');
 
 const helperService = new HelperService();
@@ -18,7 +17,7 @@ class AuthService {
                 exp: Math.floor(Date.now() / 1000) + 60 * 60 * 720,
                 id: admin._id,
               },
-              config.get('jwtSecret')
+              process.env.jwtSecret
             );
             return resolve({
               token: token,

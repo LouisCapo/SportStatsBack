@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken')
-const config = require('config')
 
 const isAuthenticated = (req, res, next) => {
   try {
@@ -12,7 +11,7 @@ const isAuthenticated = (req, res, next) => {
         },
       }).status(403);
     }
-    const decoded = jwt.verify(token, config.get('jwtSecret'))
+    const decoded = jwt.verify(token, process.env.jwtSecret)
     req.user = decoded
     next()
   } catch (err) {
