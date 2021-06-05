@@ -93,6 +93,29 @@ class TeamService {
       });
     });
   }
+
+  async getTeamList(limit, offset, sportTypeCode) {
+    const sportType = await sportService.getSportTypeByCode(sportTypeCode);
+    return new Promise((resolve, reject) => {
+      db.Team.find({sportType: sportType._id}).skip((offset - 1) * limit).limit(limit).then(teamList => {
+        console.log(teamList)
+        if (teamList.length) {
+          return Promise.all(
+            teamList.map(async (item) => {
+              await item.populate('sportType').execPopulate();
+              await item.populate('teamMembers').execPopulate();
+              return item;
+            })
+          ).then((populatedItem) => {
+            return resolve(teamList);
+          })
+        }
+        return resolve([]);
+      }).catch(err => {
+        return resolve([]);
+      });
+    })
+  }
 }
 
 module.exports = TeamService;

@@ -159,4 +159,40 @@ router.put('/edit-team', isAuthenticated, async (req, res, next) => {
   });
 })
 
+router.get('/team-list', (req, res, next) => {
+  let { offset, limit, sportTypeCode } = req.query;
+  offset = offset ? offset : 1;
+  limit = limit ? limit : 10;
+  if (helperService.isNullOrUndefined(sportTypeCode)) {
+    return res.send({
+      error: {
+        code: 2,
+        msg: 'Не указанны обязательные поля!',
+      },
+    }).status(400);
+  }
+  teamService.getTeamList(limit, offset, sportTypeCode).then(teamList => {
+    const data = teamList.map(item => {
+      return {
+        teamId: item._id,
+        teamName: item.teamName,
+        teamLogo: item.teamLogo ? item.teamLogo : null, 
+        sportType: {
+          code: item.sportType.sportCode,
+          title: item.sportType.sportTitle,
+        },
+        teamMembers: item.teamMembers.length ? item.teamMembers.map(teamMember => {
+          return {
+            playerId: teamMember._id,
+            playerName: teamMember.playerName,
+            playerNick: teamMember.playerNick ? teamMember.playerNick : null,
+            playerPhoto: teamMember.playerPhoto ? teamMember.playerPhoto : null,
+          }
+        }) : [],
+      }
+    });
+    return res.send({data: data}).status(200);
+  })
+})
+
 module.exports = router;
