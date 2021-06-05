@@ -22,7 +22,6 @@ const Player = mongoose.model('players', {
   playerTeam: { type: Schema.Types.ObjectId, ref: 'teams' },
   playerStats: [{ title: String, value: String }],
   sportType: { type: Schema.Types.ObjectId, ref: 'sports'},
-
 });
 
 const Team = mongoose.model('teams', {

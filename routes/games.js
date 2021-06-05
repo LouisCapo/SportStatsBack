@@ -12,7 +12,7 @@ const helperService = new HelperService();
 router.get('/games-list', (req, res, next) => {
   let { limit, offset, sportTypeCode, isCompleted } = req.query;
   limit = limit ? limit : 10;
-  offset = offset ? offset : 0;
+  offset = offset ? offset : 1;
   if (helperService.isNullOrUndefined(sportTypeCode) || helperService.isNullOrUndefined(isCompleted)) {
     return res.send({
       error: {

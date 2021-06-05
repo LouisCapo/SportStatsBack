@@ -66,9 +66,50 @@ class PlayerService {
               code: 2,
               msg: 'Не удалось сохранить игрока!',
             },
-            status: 400,
+            status: 501,
           });
         });
+    });
+  }
+
+  editPlayer(player) {
+    return new Promise((resolve, reject) => {
+      db.Player.findById(player.playerId).then(currentPlayer => {
+        if (!currentPlayer) {
+          return reject({
+            error: {
+              code: 2,
+              msg: 'Игрок не найден!',
+            },
+            status: 400,
+          });
+        }
+        currentPlayer.playerName = player.playerName,
+        currentPlayer.playerNick = player.playerNick ? player.playerNick : null,
+        currentPlayer.playerPhoto = player.playerPhoto ? player.playerPhoto : null,
+        currentPlayer.playerTeam = player.playerTeam ? player.playerTeam : null,
+        currentPlayer.playerBirthday = player.playerBirthday ? player.playerBirthday : null,
+        currentPlayer.playerStats = player.playerStats ? player.playerStats : [],
+        currentPlayer.save().then(res => {
+          return resolve(res);
+        }).catch(err => {
+          return reject({
+            error: {
+              code: 2,
+              msg: 'Не удалось сохранить игрока!',
+            },
+            status: 501,
+          });
+        });
+      }).catch(err => {
+        return reject({
+          error: {
+            code: 2,
+            msg: 'Игрок не найден!',
+          },
+          status: 400,
+        });
+      });
     });
   }
 }

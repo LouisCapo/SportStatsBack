@@ -39,7 +39,7 @@ class MatchesService {
   getMatchesList(sportTypeCode, offset, limit, isCompleted) {
     return new Promise(async (resolve, reject) => {
       const sportType = await sportService.getSportTypeByCode(sportTypeCode);
-      db.Matches.find({isCompleted: isCompleted, sportType: sportType._id }).sort({date: 1}).skip(offset * limit).limit(limit).then(async (list) => {   
+      db.Matches.find({isCompleted: isCompleted, sportType: sportType._id }).sort({date: 1}).skip((offset - 1) * limit).limit(limit).then(async (list) => {   
         if (list.length) {
           return Promise.all(
             list.map(async (item) => {
