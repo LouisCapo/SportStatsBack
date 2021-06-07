@@ -20,9 +20,7 @@ class MatchesService {
             status: 404,
           });
         }
-        await currentMatch.populate('sportType')
-                          .populate('firstTeam')
-                          .populate('secondTeam')
+        await currentMatch.populate('sportType firstTeam secondTeam')
                           .execPopulate();
         return resolve(currentMatch);
       }).catch(err => {
@@ -44,10 +42,7 @@ class MatchesService {
         if (list.length) {
           return Promise.all(
             list.map(async (item) => {
-              await item.populate('firstTeam')
-                        .populate('secondTeam')
-                        .populate('sportType')
-                        .execPopulate();
+              await item.populate('firstTeam secondTeam sportType').execPopulate();
               return item;
             })
           ).then((result) => {
@@ -121,10 +116,7 @@ class MatchesService {
         if (matchesList.length) {
           return Promise.all(
             matchesList.map(async (item) => {
-              await item.populate('firstTeam')
-                        .populate('secondTeam')
-                        .populate('sportType')
-                        .execPopulate();
+              await item.populate('firstTeam secondTeam sportType').execPopulate();
               return item;
             })
           ).then((result) => {
