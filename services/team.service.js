@@ -102,8 +102,9 @@ class TeamService {
         if (teamList.length) {
           return Promise.all(
             teamList.map(async (item) => {
-              await item.populate('sportType').execPopulate();
-              await item.populate('teamMembers').execPopulate();
+              await item.populate('sportType')
+                        .populate('teamMembers')
+                        .execPopulate();
               return item;
             })
           ).then((populatedItem) => {

@@ -20,9 +20,10 @@ class MatchesService {
             status: 404,
           });
         }
-        await currentMatch.populate('sportType').execPopulate();
-        await currentMatch.populate('firstTeam').execPopulate();
-        await currentMatch.populate('secondTeam').execPopulate();
+        await currentMatch.populate('sportType')
+                          .populate('firstTeam')
+                          .populate('secondTeam')
+                          .execPopulate();
         return resolve(currentMatch);
       }).catch(err => {
         return reject({
@@ -43,11 +44,11 @@ class MatchesService {
         if (list.length) {
           return Promise.all(
             list.map(async (item) => {
-              let populatedItem = item;
-              await populatedItem.populate('firstTeam').execPopulate();
-              await populatedItem.populate('secondTeam').execPopulate();
-              await populatedItem.populate('sportType').execPopulate();
-              return populatedItem;
+              await item.populate('firstTeam')
+                        .populate('secondTeam')
+                        .populate('sportType')
+                        .execPopulate();
+              return item;
             })
           ).then((result) => {
             return resolve(result);
@@ -120,11 +121,11 @@ class MatchesService {
         if (matchesList.length) {
           return Promise.all(
             matchesList.map(async (item) => {
-              let populatedItem = item;
-              await populatedItem.populate('firstTeam').execPopulate();
-              await populatedItem.populate('secondTeam').execPopulate();
-              await populatedItem.populate('sportType').execPopulate();
-              return populatedItem;
+              await item.populate('firstTeam')
+                        .populate('secondTeam')
+                        .populate('sportType')
+                        .execPopulate();
+              return item;
             })
           ).then((result) => {
             return resolve(result);
