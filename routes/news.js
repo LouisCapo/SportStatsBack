@@ -23,13 +23,14 @@ router.get('/get-news', (req, res, next) => {
     newsService
       .getNewsById(id)
       .then((currentNews) => {
+        console.log(currentNews)
         const data = {
           newsId: currentNews._id,
           newsTitle: currentNews.title ? currentNews.title : null,
           newsSubtitle: currentNews.subtitle ? currentNews.subtitle : null,
           newsText: currentNews.newsText ? currentNews.newsText : null,
           newsDate: currentNews.date ? currentNews.date : null,
-          newsPhotos: currentNews.photos ? currentNews.photos : [],
+          newsPhoto: currentNews.photo ? currentNews.photo : null,
           sportType: currentNews.sportType
             ? {
                 title: currentNews.sportType.sportTitle,

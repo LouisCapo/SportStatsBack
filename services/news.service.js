@@ -36,7 +36,7 @@ class NewsService {
   getNewsListBySportCode(sportCode, limit, offset) {
     return new Promise((resolve, reject) => {
       if (+sportCode === -1) {
-        db.News.find().skip(offset * limit).limit(limit).sort({'_id':-1}).then(res => {
+        db.News.find().skip(offset * limit).limit(limit).sort({date: 1}).then(res => {
           return resolve(res);
         }).catch(err => {
           return reject({
