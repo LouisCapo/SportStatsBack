@@ -94,7 +94,7 @@ class PlayerService {
         currentPlayer.playerName = player.playerName,
         currentPlayer.playerNick = player.playerNick ? player.playerNick : null,
         currentPlayer.playerPhoto = player.playerPhoto ? player.playerPhoto : null,
-        currentPlayer.playerTeam = team?._id ? team._id : null,
+        currentPlayer.playerTeam = team && team._id ? team._id : null,
         currentPlayer.playerBirthday = player.playerBirthday ? player.playerBirthday : null,
         currentPlayer.playerStats = player.playerStats ? player.playerStats : [],
         currentPlayer.sportType = sportType._id,
