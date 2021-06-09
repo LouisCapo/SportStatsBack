@@ -16,7 +16,7 @@ class HelperService {
 		players.forEach(res => {
 			ages += this.getCurrentAge(res.playerBirthday);
 		});
-		return ages / players.length;
+		return (ages / players.length).toFixed(1);
 	}
 
 	isNullOrUndefined(value) {

@@ -1,7 +1,9 @@
 const db = require('../model/db');
 const SportService = require('../services/sport.service');
+const TeamService = require('../services/team.service');
 
 const sportService = new SportService();
+const teamService = new TeamService();
 
 class PlayerService {
   constructor() {}
@@ -73,7 +75,12 @@ class PlayerService {
   }
 
   editPlayer(player) {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+      const sportType = await sportService.getSportTypeByCode(player.sportTypeCode);
+      let team;
+      if (player.playerTeamId) {
+        team = await teamService.getTeamById(player.playerTeamId);
+      }
       db.Player.findById(player.playerId).then(currentPlayer => {
         if (!currentPlayer) {
           return reject({
@@ -87,9 +94,10 @@ class PlayerService {
         currentPlayer.playerName = player.playerName,
         currentPlayer.playerNick = player.playerNick ? player.playerNick : null,
         currentPlayer.playerPhoto = player.playerPhoto ? player.playerPhoto : null,
-        currentPlayer.playerTeam = player.playerTeam ? player.playerTeam : null,
+        currentPlayer.playerTeam = team?._id ? team._id : null,
         currentPlayer.playerBirthday = player.playerBirthday ? player.playerBirthday : null,
         currentPlayer.playerStats = player.playerStats ? player.playerStats : [],
+        currentPlayer.sportType = sportType._id,
         currentPlayer.save().then(res => {
           return resolve(res);
         }).catch(err => {

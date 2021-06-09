@@ -115,4 +115,54 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
   }
 });
 
+router.put('/edit-player', isAuthenticated, async (req, res, next) => {
+  const isAdmin = await authService.isUserAdmin(req.user.id);
+  if (isAdmin) {
+    return res.send({
+      error: {
+        code: 1,
+        msg: 'Нет доступа!',
+      },
+    }).status(403);
+  }
+  const {
+    playerName,
+    playerNick,
+    playerPhoto,
+    playerBirthday,
+    playerTeamId,
+    playerStats,
+    sportTypeCode,
+    playerId,
+  } = req.body;
+  if (helperService.isNullOrUndefined(playerName) || 
+      helperService.isNullOrUndefined(sportTypeCode) || 
+      helperService.isNullOrUndefined(playerId) || 
+      playerId.length !== 24) {
+    return res.send({
+      error: {
+        code: 3,
+        msg: 'Не переданы обязательные параметры!',
+      },
+    }).status(400);
+  }
+  const data = {
+    playerName,
+    sportTypeCode,
+    playerId,
+    playerNick: playerNick ? playerNick : null,
+    playerPhoto: playerPhoto ? playerPhoto : null,
+    playerBirthday: playerBirthday ? playerBirthday : null,
+    playerTeamId: playerTeamId ? playerTeamId : null,
+    playerStats: playerStats && playerStats.length ? playerStats : [],
+  }
+  playerService.editPlayer(data).then(currentPlayer => {
+    return res.send({id: currentPlayer._id});
+  }).catch(err => {
+    return res.send({
+      error: err.error,
+    }).status(err.status);
+  })
+})
+
 module.exports = router;
