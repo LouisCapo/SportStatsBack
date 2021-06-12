@@ -60,7 +60,6 @@ router.post('/create-sport-type', isAuthenticated, async (req, res, next) => {
       sportTitle: sportTitle,
       sportCode: newSportCode
     }
-    console.log(data);
     const newSportType = new db.Sports(data);
     newSportType.save().then(newSport => {
       res.send(newSport).status(200);

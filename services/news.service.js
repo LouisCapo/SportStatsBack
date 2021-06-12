@@ -75,10 +75,6 @@ class NewsService {
     })
   }
 
-  saveNewsPhoto(photo, newsId) {
-    console.log(photo);
-  }
-
 }
 
 module.exports = NewsService;

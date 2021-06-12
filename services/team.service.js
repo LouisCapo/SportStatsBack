@@ -98,7 +98,6 @@ class TeamService {
     const sportType = await sportService.getSportTypeByCode(sportTypeCode);
     return new Promise((resolve, reject) => {
       db.Team.find({sportType: sportType._id}).skip((offset - 1) * limit).limit(limit).then(teamList => {
-        console.log(teamList)
         if (teamList.length) {
           return Promise.all(
             teamList.map(async (item) => {
