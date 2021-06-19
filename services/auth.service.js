@@ -14,7 +14,7 @@ class AuthService {
           if (helperService.isValidPassword(password, admin.password)) {
             const token = jwt.sign(
               {
-                exp: Math.floor(Date.now() / 1000) + 60 * 60 * 720,
+                exp: Math.floor(Date.now() + (1000 * 60 * 60 * 24)),
                 id: admin._id,
               },
               process.env.jwtSecret
@@ -43,10 +43,12 @@ class AuthService {
   }
 
   isUserAdmin(id) {
-    db.Admin.findById(id).then((admin) => {
-      return !!admin;
-    }).catch(err => {
-      return false;
+    return new Promise(async (resolve, reject) => {
+      db.Admin.findById(id).then(admin => {
+        return resolve(!!admin);
+      }).catch(err => {
+        return resolve(false);
+      });
     });
   }
 

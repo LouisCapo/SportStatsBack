@@ -35,15 +35,6 @@ router.post('/login', (req, res, next) => {
 
 router.get('/isAdmin', isAuthenticated, async (req, res, next) => {
   try {
-    const isAdmin = await authService.isUserAdmin(req.user.id);
-    if (isAdmin) {
-      return res.send({
-        error: {
-          code: 1,
-          msg: 'Нет доступа!',
-        },
-      }).status(403);
-    }
     return res.send({Ok: 1}).status(200);
   } catch(err) {
     return res.send({

@@ -1,15 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const isAuthenticated = require('../controllers/auth');
-const AuthService = require('../services/auth.service');
 const HelperService = require('../services/helper.service');
 const TeamService = require('../services/team.service');
-const SearchService = require('../services/search.service');
 const MatchesService = require('../services/matches.service');
 
 const helperService = new HelperService();
 const teamService = new TeamService();
-const authService = new AuthService();
 const matchesService = new MatchesService();
 
 router.get('/get-team', (req, res, next) => {
@@ -81,15 +78,6 @@ router.get('/get-team', (req, res, next) => {
 });
 
 router.post('/create-team', isAuthenticated, async (req, res, next) => {
-  const isAdmin = await authService.isUserAdmin(req.user.id);
-  if (isAdmin) {
-    return res.send({
-      error: {
-        code: 1,
-        msg: 'Нет доступа!',
-      },
-    }).status(403);
-  } 
   const {
     teamName,
     teamLogo,
@@ -118,15 +106,6 @@ router.post('/create-team', isAuthenticated, async (req, res, next) => {
 });
 
 router.put('/edit-team', isAuthenticated, async (req, res, next) => {
-  const isAdmin = await authService.isUserAdmin(req.user.id);
-  if (isAdmin) {
-    return res.send({
-      error: {
-        code: 1,
-        msg: 'Нет доступа!',
-      },
-    }).status(403);
-  } 
   const {
     teamId,
     teamName,

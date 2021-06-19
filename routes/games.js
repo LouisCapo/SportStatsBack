@@ -1,11 +1,9 @@
 const express = require('express');
 const isAuthenticated = require('../controllers/auth');
 const router = express.Router();
-const AuthService = require('../services/auth.service');
 const MatchesService = require('../services/matches.service')
 const HelperService = require('../services/helper.service')
 
-const authService = new AuthService();
 const matchesService = new MatchesService();
 const helperService = new HelperService();
 
@@ -105,15 +103,6 @@ router.get('/match', (req, res, next) => {
 })
 
 router.post('/create-match', isAuthenticated, async (req, res, next) => {
-  const isAdmin = await authService.isUserAdmin(req.user.id);
-  if (isAdmin) {
-    return res.send({
-      error: {
-        code: 1,
-        msg: 'Нет доступа!',
-      },
-    }).status(403);
-  } 
   const {
     firstTeamId,
     secondTeamId,

@@ -1,26 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const isAuthenticated = require('../controllers/auth');
+const errorMiddleware = require('../controllers/error-middleware')
 const PlayerService = require('../services/player.service');
-const AuthService = require('../services/auth.service');
 const HelperService = require('../services/helper.service');
 
 const playerService = new PlayerService();
-const authService = new AuthService();
 const helperService = new HelperService();
 
 router.get('/get-player', async (req, res, next) => {
   try {
     const { id } = req.query;
-    if (id.length !== 24) {
-      return res
-        .send({
-          error: {
-            code: 2,
-            msg: 'Неверный формат id!',
-          },
-        })
-        .status(400);
+    if (!id || id.length !== 24) {
+      return next({
+        code: 2,
+        msg: 'Неверный формат id!',
+        status: 400,
+      })
     }
     playerService.getPlayerById(id).then(player => {
       const data = {
@@ -48,28 +44,17 @@ router.get('/get-player', async (req, res, next) => {
       }).status(err.status);
     })
   } catch (error) {
-    res
-      .send({
-        error: {
-          code: 0,
-          msg: 'Непредвиденная ошибка!',
-        },
-      })
-      .status(500);
+    return next({
+      code: 0,
+      msg: 'Непредвиденная ошибка!',
+      logMessage: error,
+      status: 500,
+    });
   }
-});
+}, errorMiddleware);
 
 router.post('/create-player', isAuthenticated, async (req, res, next) => {
   try {
-    const isAdmin = await authService.isUserAdmin(req.user.id);
-    if (isAdmin) {
-      return res.send({
-        error: {
-          code: 1,
-          msg: 'Нет доступа!',
-        },
-      }).status(403);
-    } 
     const {
       playerName,
       playerNick,
@@ -79,13 +64,12 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
       playerStats,
       sportTypeCode,
     } = req.body;
-    if (!playerName) {
-      return res.send({
-          error: {
-            code: 3,
-            msg: 'Не передан playerName!',
-          },
-        }).status(400);
+    if (!playerName || helperService.isNullOrUndefined(sportTypeCode)) {
+      return next({
+        code: 3,
+        msg: 'Не передан playerName!',
+        status: 400,
+      });
     }
     const data = {
       playerName: playerName,
@@ -113,18 +97,9 @@ router.post('/create-player', isAuthenticated, async (req, res, next) => {
         },
       }).status(500);
   }
-});
+}, errorMiddleware);
 
 router.put('/edit-player', isAuthenticated, async (req, res, next) => {
-  const isAdmin = await authService.isUserAdmin(req.user.id);
-  if (isAdmin) {
-    return res.send({
-      error: {
-        code: 1,
-        msg: 'Нет доступа!',
-      },
-    }).status(403);
-  }
   const {
     playerName,
     playerNick,
