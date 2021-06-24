@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const isAuthenticated = require('../controllers/auth');
-const errorMiddleware = require('../controllers/error-middleware')
+const errorMiddleware = require('../controllers/error-middleware');
 const PlayerService = require('../services/player.service');
 const HelperService = require('../services/helper.service');
 

@@ -1,9 +1,14 @@
 const express = require('express');
 const isAuthenticated = require('../controllers/auth');
+const errorMiddleware = require('../controllers/error-middleware');
 const router = express.Router();
 const NewsService = require('../services/news.service');
+const SportService = require('../services/sport.service');
+const HelperService = require('../services/helper.service');
 
 const newsService = new NewsService();
+const sportService = new SportService();
+const helperService = new HelperService();
 
 router.get('/get-news', (req, res, next) => {
   try {
@@ -16,9 +21,11 @@ router.get('/get-news', (req, res, next) => {
           },
         }).status(400);
     }
-    newsService
-      .getNewsById(id)
-      .then((currentNews) => {
+    newsService.getNewsById(id).then(async (currentNews) => {
+      let sportType;
+      if (!helperService.isNullOrUndefined(currentNews.sportTypeCode)) {
+        sportType = await sportService.getSportTypeByCode(currentNews.sportTypeCode)
+      }
         const data = {
           newsId: currentNews._id,
           newsTitle: currentNews.title ? currentNews.title : null,
@@ -26,10 +33,10 @@ router.get('/get-news', (req, res, next) => {
           newsText: currentNews.newsText ? currentNews.newsText : null,
           newsDate: currentNews.date ? currentNews.date : null,
           newsPhoto: currentNews.photo ? currentNews.photo : null,
-          sportType: currentNews.sportType
+          sportType: sportType
             ? {
-                title: currentNews.sportType.sportTitle,
-                code: currentNews.sportType.sportCode,
+                title: sportType.sportTitle,
+                code: sportType.sportCode,
               }
             : null,
         };
@@ -133,7 +140,57 @@ router.post('/create-news', isAuthenticated, async (req, res, next) => {
       error: err.error,
     }).status(err.status);
   })
+});
 
-})
+router.put('/edit-news', isAuthenticated, (req, res, next) => {
+  const {
+    id,
+    newsTitle,
+    sportTypeCode,
+    newsSubtitle,
+    newsText,
+    newsPhoto
+  } = req.body;
+  if (
+    helperService.isNullOrUndefined(id) ||
+    helperService.isNullOrUndefined(newsTitle) ||
+    helperService.isNullOrUndefined(sportTypeCode) ||
+    helperService.isNullOrUndefined(newsSubtitle) ||
+    helperService.isNullOrUndefined(newsText)
+  ) {
+    return next({
+      code: 0,
+      msg: 'Не переданы обязательные параметры!',
+      status: 400,
+    });
+  }
+  if (id.length !== 24) {
+    console.log(321)
+    return next({
+      code: 0,
+      msg: 'Неверный формат id!',
+      status: 400,
+    });
+  }
+  const data = {
+    title: newsTitle,
+    id,
+    sportTypeCode,
+    subtitle: newsSubtitle,
+    newsText,
+    photo: newsPhoto ? newsPhoto : null,
+  }
+  console.log(123123)
+  newsService.editNews(data).then(currentNews => {
+    return res.send({id: currentNews._id}).status(200);
+  }).catch(err => {
+    return next({
+      code: 0,
+      msg: 'Непредвиденная ошибка!',
+      logMessage: err,
+      status: 500,
+    });
+  });
+}, errorMiddleware);
 
 module.exports = router;

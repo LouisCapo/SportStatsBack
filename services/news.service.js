@@ -1,4 +1,7 @@
 const db = require('../model/db');
+const SportService = require('../services/sport.service');
+
+const sportService = new SportService();
 
 class NewsService {
   constructor() { }
@@ -72,6 +75,47 @@ class NewsService {
           status: 400,
         });
       })
+    })
+  }
+
+  editNews(news) {
+    console.log(news)
+    return new Promise(async (resolve, reject) => {
+      db.News.findById(news.id).then(currentNews => {
+        if (!currentNews) {
+          return reject({
+            error: {
+              code: 1,
+              msg: 'Игрок не найден!',
+            },
+            status: 400,
+          });
+        }
+        currentNews.title = news.title;
+        currentNews.subtitle = news.subtitle;
+        currentNews.newsText = news.newsText;
+        currentNews.sportTypeCode = news.sportTypeCode;
+        currentNews.photo = news.photo ? news.photo : null;
+        currentNews.save().then(res => {
+          return resolve(res);
+        }).catch(err => {
+          return reject({
+            error: {
+              code: 2,
+              msg: 'Не удалось сохранить новость!',
+            },
+            status: 501,
+          });
+        });
+      }).catch(err => {
+        return reject({
+          error: {
+            code: 2,
+            msg: 'Не удалось сохранить новость!',
+          },
+          status: 501,
+        });
+      });
     })
   }
 
