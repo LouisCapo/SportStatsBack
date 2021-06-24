@@ -43,8 +43,8 @@ router.get('/games-list', (req, res, next) => {
         },
         date: item.date ? item.date : null,
         score: {
-          firstTeam: item.score.firstTeam ? item.score.firstTeam : null,
-          secondTeam: item.score.secondTeam ? item.score.secondTeam : null,
+          firstTeam: !helperService.isNullOrUndefined(item.score.firstTeam) ? item.score.firstTeam : null,
+          secondTeam: !helperService.isNullOrUndefined(item.score.secondTeam) ? item.score.secondTeam : null,
         },
         sportType: {
           code: item.sportType.sportCode,
