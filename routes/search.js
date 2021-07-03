@@ -17,34 +17,33 @@ router.get('/get-coincidence', async (req, res, next) => {
     }).status(400);
   }
   const data = [];
-  const teamResult = await searchService.getCoincidenceInTeamName(value);
-  const playerNameResult = await searchService.getCoincidenceInPlayerName(value);
-  const playerNickResult = await searchService.getCoincidenceInPlayerNick(value);
-  data.push(teamResult.map(item => {
-    return {
-      type: 'team',
-      id: item._id,
-      title: item.teamName,
-      photo: item.teamLogo ? item.teamLogo : null,
-    }
-  }));
-  data.push(playerNameResult.map(item => {
-    return {
-      type: 'player',
-      id: item._id,
-      title: item.playerName,
-      photo: item.playerPhoto ? item.playerPhoto : null,
-    }
-  }));
-  data.push(playerNickResult.map(item => {
-    return {
-      type: 'player',
-      id: item._id,
-      title: item.playerName,
-      photo: item.playerPhoto ? item.playerPhoto : null,
-    }
-  }))
-  return res.send({data: [].concat(...data).slice(0, 10)}).status(200);
+  Promise.all([
+    searchService.getCoincidenceInTeamName(value),
+    searchService.getCoincidenceInPlayerName(value),
+    searchService.getCoincidenceInPlayerNick(value),
+  ]).then((coincident) => {
+    const teamList = coincident[0];
+    const playerList = coincident[1].concat(coincident[2]);
+    data.push(teamList.map(item => {
+      return {
+        type: 'team',
+        id: item._id,
+        title: item.teamName,
+        photo: item.teamLogo ? item.teamLogo : null,
+      }
+    }));
+    data.push(playerList.map(item => {
+      if (!data.filter(el => el.id === item._id)[0]) {
+        return {
+          type: 'player',
+          id: item._id,
+          title: item.playerName,
+          photo: item.playerPhoto ? item.playerPhoto : null,
+        }
+      }
+    }));
+    return res.send({data: data.flat()}).status(200);
+  });
 })
 
 module.exports = router;

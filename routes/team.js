@@ -1,13 +1,16 @@
 const express = require('express');
 const router = express.Router();
 const isAuthenticated = require('../controllers/auth');
+const errorMiddleware = require('../controllers/error-middleware');
 const HelperService = require('../services/helper.service');
 const TeamService = require('../services/team.service');
 const MatchesService = require('../services/matches.service');
+const SearchService = require('../services/search.service');
 
 const helperService = new HelperService();
 const teamService = new TeamService();
 const matchesService = new MatchesService();
+const searchService = new SearchService();
 
 router.get('/get-team', (req, res, next) => {
   try {
@@ -173,5 +176,35 @@ router.get('/team-list', (req, res, next) => {
     return res.send({data: data}).status(200);
   })
 })
+
+router.get('/team-options', (req, res, next) => {
+  let { teamName } = req.query;
+  if (helperService.isNullOrUndefined(teamName)) {
+    return next({
+      code: 3,
+      msg: 'Не переданы обязательные параметры!',
+      status: 400,
+    });
+  }
+  searchService.getCoincidenceInTeamName(teamName).then(teams => {
+    const data = {
+      data: teams.map(item => {
+        return {
+          teamId: item._id,
+          teamName: item.teamName,
+          teamLogo: item.teamLogo ? item.teamLogo : null,
+        }
+      })
+    }
+    return res.send(data).status(200);
+  }).catch(err => {
+    return next({
+      code: 0,
+      msg: 'Непредвиденная ошибка!',
+      logMessage: err,
+      status: 500,
+    });
+  })
+}, errorMiddleware);
 
 module.exports = router;
